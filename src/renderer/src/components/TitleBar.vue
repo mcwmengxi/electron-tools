@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import logo from '../assets/electron.svg'
-const platform = window.platform
+const platform = window.electron.process.platform
 // 最小化
 const minimize = () => {
   window.electron.ipcRenderer.send('detach:service', { type: 'minimize' })
