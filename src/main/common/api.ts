@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, screen } from 'electron'
+import { BrowserWindow, ipcMain, Notification, screen } from 'electron'
 
 class API {
   init(mainWindow: BrowserWindow): void {
@@ -33,6 +33,15 @@ class API {
       width: data.width,
       height: data.height
     })
+  }
+  public showNotification({ data: { body } }) {
+    if (!Notification.isSupported()) return
+    const notification = new Notification({
+      title: '标题',
+      body,
+      icon: ''
+    })
+    notification.show()
   }
 }
 

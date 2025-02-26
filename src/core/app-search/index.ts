@@ -1,4 +1,4 @@
-import envRecogn from '../../common/utils/env'
+import envRecogn from '../../common/utils/envHelper'
 
 let syncModule
 if (envRecogn.windows()) {
