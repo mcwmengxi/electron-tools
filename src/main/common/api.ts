@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain, Notification, screen } from 'electron'
+import DBInstance from './db'
 
-class API {
+class API extends DBInstance {
   init(mainWindow: BrowserWindow): void {
     // 响应 preload.js 事件
     ipcMain.on('msg-trigger', async (event, args) => {
@@ -36,10 +37,12 @@ class API {
   }
   public showNotification({ data: { body } }) {
     if (!Notification.isSupported()) return
+    'string' != typeof body && (body = String(body))
+    const plugin = this.currentPlugin
     const notification = new Notification({
-      title: '标题',
+      title: plugin?.name || null,
       body,
-      icon: ''
+      icon: plugin?.logo || null
     })
     notification.show()
   }

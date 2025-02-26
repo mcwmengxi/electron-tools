@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
+import electron, { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -9,6 +9,7 @@ import registerSystemPlugin from './common/registerSystemPlugin'
 import main from './browsers/main'
 import envHelper from '../common/utils/envHelper'
 import '../common/utils/localPlugins'
+import localConfig from './common/initLocalConfig'
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
@@ -50,9 +51,20 @@ class App {
   }
   onReady() {
     const readyFunction = async () => {
+      await localConfig.init()
+      const config = await localConfig.getConfig()
+      console.log(config, '--------')
+      if (!config.perf.common.guide) {
+        // 打开引导页 todo
+      }
       // ...
       // 触发 onReady
-      this.systemPlugins.triggerReadyHooks()
+      this.systemPlugins.triggerReadyHooks(
+        Object.assign(electron, {
+          mainWindow: this.windowCreator.getWindow(),
+          API
+        })
+      )
     }
     // if (!app.isReady()) {
     //   app.on('ready', readyFunction);

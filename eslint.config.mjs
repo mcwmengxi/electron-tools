@@ -20,7 +20,8 @@ export default tseslint.config(
       'vue/require-default-prop': 'off',
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/no-unused-expressions': 'warn'
+      '@typescript-eslint/no-unused-expressions': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn'
     }
   },
   eslintConfigPrettier

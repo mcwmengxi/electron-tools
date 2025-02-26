@@ -29,7 +29,8 @@
     "element-plus": "^2.9.5",
     "extract-file-icon": "^0.3.2",
     "fs-extra": "^11.3.0",
-    "got": "^14.4.6",
+    "got": "^10.7.0",
+    "pouchdb": "^9.0.0",
     "rubick-color": "^4.2.1"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@types/got": "^9.6.12",
     "@types/node": "^22.13.4",
+    "@types/pouchdb": "^6.4.2",
     "@vitejs/plugin-vue": "^5.2.1",
     "electron": "^34.2.0",
     "electron-builder": "^25.1.8",
