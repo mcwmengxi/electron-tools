@@ -5,8 +5,22 @@ const dbInstance = new LocalDb(app.getPath('userData'))
 dbInstance.init()
 
 export default class DBInstance {
+  /**
+   * 当前插件实例
+   * @type {null | any}
+   */
   public currentPlugin: null | any = null
+
+  /**
+   * 数据库默认键名 (插件信息)
+   * @type {string}
+   */
   private DBKEY = 'TOOLS_DB_DEFAULT'
+
+  /**
+   * 插件信息键名
+   * @type {string}
+   */
   private DB_INFO_KET = 'TOOLS_PLUGIN_INFO'
 
   public async dbPut({ data }) {
