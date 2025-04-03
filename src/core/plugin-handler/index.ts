@@ -10,35 +10,44 @@ import { AdapterHandlerOptions, AdapterInfo } from './types'
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import axios from 'axios'
+import api from '../../main/common/api'
 
 class AdapterHandler {
   // 插件安装地址
   public baseDir: string
   // 插件源地址
-  readonly registry: string
+  private registry: string
 
   pluginCaches = {}
 
   constructor(options: AdapterHandlerOptions) {
-    if (fs.existsSync(options.baseDir)) {
+    if (!fs.existsSync(options.baseDir)) {
       fs.mkdirSync(options.baseDir)
       fs.writeFileSync(options.baseDir + '/package.json', '{"dependencies":{}}')
     }
     this.baseDir = options.baseDir
 
-    let register = options.registry || 'https://registry.npmmirror.com'
-    try {
-      const dbData = ipcRenderer.sendSync('msg-trigger', {
-        type: 'dbGet',
-        data: { id: 'tools-localhost-config' }
-      })
-      register = dbData.data.register
-    } catch (error) {
-      console.log(error)
-    }
-    this.registry = register || 'https://registry.npmmirror.com/'
+    this.registry = options.registry || 'https://registry.npmmirror.com'
+    // 初始化注册表配置
+    this.initRegistry()
   }
 
+  private initRegistry(): void {
+    api
+      .dbGet({
+        data: {
+          id: 'tools-localhost-config'
+        }
+      })
+      .then((dbData) => {
+        if (dbData?.data?.register) {
+          this.registry = dbData.data.register
+        }
+      })
+      .catch((error) => {
+        console.log('查询配置出错', error)
+      })
+  }
   // 运行包管理器命令
   private async execCommand(cmd: string, modules: string[]): Promise<Record<string, unknown>> {
     return new Promise((resolve, reject) => {

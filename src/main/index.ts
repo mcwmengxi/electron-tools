@@ -1,14 +1,16 @@
-import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
-import { join } from 'path'
+import electron, { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
+import path, { join } from 'node:path'
+import url from 'node:url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import API from './common/api'
 import Detch from './browsers/detch'
-import SearchPlugin from '../core/app-search/index'
+// import SearchPlugin from '../core/app-search/index'
 import registerSystemPlugin from './common/registerSystemPlugin'
 import main from './browsers/main'
 import envHelper from '../common/utils/envHelper'
 import '../common/utils/localPlugins'
+import localConfig from './common/initLocalConfig'
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
@@ -50,9 +52,27 @@ class App {
   }
   onReady() {
     const readyFunction = async () => {
+      // 这个需要在app.ready触发之后使用
+      protocol.handle('app', (req) => {
+        const filePath = req.url.slice('app://'.length)
+        console.log(filePath, 'app')
+        return net.fetch(url.pathToFileURL(path.join(__dirname, filePath)).toString())
+      })
+
+      await localConfig.init()
+      const config = await localConfig.getConfig()
+
+      if (!config?.perf?.common?.guide) {
+        // 打开引导页 todo
+      }
       // ...
       // 触发 onReady
-      this.systemPlugins.triggerReadyHooks()
+      this.systemPlugins.triggerReadyHooks(
+        Object.assign(electron, {
+          mainWindow: this.windowCreator.getWindow(),
+          API
+        })
+      )
     }
     // if (!app.isReady()) {
     //   app.on('ready', readyFunction);
@@ -84,7 +104,7 @@ class App {
       Detch().init()
 
       // todo
-      await SearchPlugin.getSearchList?.()
+      // await SearchPlugin.getSearchList?.()
       app.on('activate', () => {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.

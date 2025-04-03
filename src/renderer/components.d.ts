@@ -8,7 +8,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ElCol: typeof import('element-plus/es')['ElCol']
     ElIcon: typeof import('element-plus/es')['ElIcon']
+    ElInput: typeof import('element-plus/es')['ElInput']
+    ElRow: typeof import('element-plus/es')['ElRow']
+    Result: typeof import('./src/components/Result.vue')['default']
+    Search: typeof import('./src/components/Search.vue')['default']
     TitleBar: typeof import('./src/components/TitleBar.vue')['default']
     Versions: typeof import('./src/components/Versions.vue')['default']
   }

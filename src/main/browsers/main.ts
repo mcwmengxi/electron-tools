@@ -1,4 +1,4 @@
-import { BrowserWindow, shell } from 'electron'
+import { BrowserWindow, protocol, shell } from 'electron'
 
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
@@ -49,6 +49,22 @@ export default () => {
       // 生产环境，加载构建后的文件
       mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
     }
+    // 设置 CSP
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': [
+            "default-src 'self'; img-src 'self' data: app://; script-src 'self'; style-src 'self' 'unsafe-inline';"
+          ]
+        }
+      })
+    })
+    protocol.interceptFileProtocol('image', (req, callback) => {
+      const url = req.url.substr(8)
+      console.log(url, 'image')
+      callback(decodeURI(url))
+    })
     return mainWindow
   }
   const getWindow = () => mainWindow

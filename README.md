@@ -11,13 +11,13 @@ An Electron application with Vue and TypeScript
 ### Install
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
 ### Development
 
 ```bash
-$ pnpm dev
+pnpm dev
 ```
 
 ### Build
@@ -31,4 +31,26 @@ $ pnpm build:mac
 
 # For Linux
 $ pnpm build:linux
+```
+
+### 查看数据库
+
+```bash
+npx pouchdb-server --port 5984
+```
+
+### CSP
+
+```javascript
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: app://; script-src 'self'; style-src 'self' 'unsafe-inline';">
+
+// 在 Electron 主进程中设置 CSP 如果在主进程中设置了 CSP，也需要更新
+mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+  callback({
+    responseHeaders: {
+      ...details.responseHeaders,
+      'Content-Security-Policy': ["default-src 'self'; img-src 'self' data: app://; script-src 'self'; style-src 'self' 'unsafe-inline';"]
+    }
+  })
+})
 ```
