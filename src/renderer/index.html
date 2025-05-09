@@ -6,8 +6,10 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: app://"
+      content="default-src * 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: app://*; connect-src * http: blob:;"
     />
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: https://xxx.com;media-src * blob: 'self' http://* 'unsafe-inline' 'unsafe-eval';style-src * 'self' 'unsafe-inline';img-src * 'self' data: content: app: ;connect-src * blob:;"> -->
+
   </head>
 
   <body>

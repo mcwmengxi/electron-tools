@@ -5,7 +5,7 @@ import Search from './components/Search.vue'
 import Result from './components/Result.vue'
 import useDrag from './utils/dragWindow'
 import createPluginManager from './plugins-manager'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, toRaw, watch } from 'vue'
 import getWinHeight from '@common/utils/getWinHeight'
 import { PLUGIN_HISTORY } from '@common/constants/renderer'
 import { ElMessage } from 'element-plus'
@@ -19,6 +19,7 @@ const {
   setSearchValue,
   onSearch,
   initPlugins,
+  openPlugin,
   getPluginInfo,
   options,
   pluginLoading,
@@ -110,10 +111,16 @@ const choosePlugin = (plugin) => {
     )
   }
 }
-const openMenu = () => {
+const openMenu = (ext: string | undefined) => {
   // todo 打开插件市场
-  console.log('openMenu')
-
+  const sysyemPlugin = {
+    ...toRaw(menuPluginInfo.value),
+    feature: menuPluginInfo.value?.features[0],
+    cmd: '插件市场',
+    ext
+  }
+  console.log('openMenu', sysyemPlugin)
+  openPlugin(sysyemPlugin)
   // window.electron.ipcRenderer.send('open-menu')
 }
 

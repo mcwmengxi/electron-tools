@@ -12,10 +12,12 @@ const searchManager = () => {
     const value = e.target.value
     state.searchValue = value
   }
-
-  window.setSubInput = ({ placeholder }: { placeholder: string }) => {
+  const setSubInput = ({ placeholder }: { placeholder: string }) => {
     state.placeholder = placeholder
   }
+  // window.setSubInput = ({ placeholder }: { placeholder: string }) => {
+  //   state.placeholder = placeholder
+  // }
   window.removeSubInput = () => {
     state.placeholder = ''
   }
@@ -33,7 +35,8 @@ const searchManager = () => {
   return {
     ...toRefs(state),
     onSearch,
-    setSearchValue
+    setSearchValue,
+    setSubInput
   }
 }
 export default searchManager

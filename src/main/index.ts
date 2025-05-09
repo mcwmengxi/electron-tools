@@ -1,5 +1,6 @@
 import electron, { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import path, { join } from 'node:path'
+import fs from 'fs-extra'
 import url from 'node:url'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -21,7 +22,16 @@ class App {
   constructor() {
     // 注册协议
     protocol.registerSchemesAsPrivileged([
-      { scheme: 'app', privileges: { secure: true, standard: true } }
+      {
+        scheme: 'app',
+        privileges: {
+          secure: true, // 让 Electron 信任这个方式就像信任网站的 HTTPS 一样
+          supportFetchAPI: true, // 允许我们像在网页上那样请求资源
+          standard: true, // 让这种方式的网址看起来像普通的网址
+          bypassCSP: true, // 允许我们绕过一些安全限制
+          stream: true // 允许我们以流的形式读取文件，这对于大文件很有用
+        }
+      }
     ])
     this.windowCreator = main()
     // 单实例运行
@@ -52,11 +62,29 @@ class App {
   }
   onReady() {
     const readyFunction = async () => {
+      // 一个辅助函数，用于处理不同操作系统的文件路径问题
+      function convertPath(originalPath) {
+        const match = originalPath.match(/^\/([a-zA-Z])\/(.*)$/)
+        if (match) {
+          // 为 Windows 系统转换路径格式
+          return `${match[1]}:/${match[2]}`
+        } else {
+          return originalPath // 其他系统直接使用原始路径
+        }
+      }
+
       // 这个需要在app.ready触发之后使用
-      protocol.handle('app', (req) => {
-        const filePath = req.url.slice('app://'.length)
-        console.log(filePath, 'app')
-        return net.fetch(url.pathToFileURL(path.join(__dirname, filePath)).toString())
+      protocol.handle('app', async (request) => {
+        const decodedUrl = decodeURIComponent(request.url.replace(new RegExp(`^app:/`, 'i'), ''))
+
+        const fullPath = process.platform === 'win32' ? convertPath(decodedUrl) : decodedUrl
+
+        const data = await fs.readFile(fullPath) // 异步读取文件内容
+        return new Response(data) // 将文件内容作为响应返回
+
+        // const filePath = req.url.slice('app://'.length)
+        // console.log(filePath, 'app')
+        // return net.fetch(url.pathToFileURL(path.join(__dirname, filePath)).toString())
       })
 
       await localConfig.init()

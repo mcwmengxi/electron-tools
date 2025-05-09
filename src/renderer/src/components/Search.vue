@@ -208,6 +208,8 @@ const showSeparate = () => {}
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .search-box {

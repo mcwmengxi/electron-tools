@@ -35,7 +35,7 @@ const createPluginManager = () => {
     pluginHistory: []
   })
   const appList = ref<Recordable>([])
-  const { searchValue, placeholder, onSearch, setSearchValue } = searchManager()
+  const { searchValue, placeholder, onSearch, setSearchValue, setSubInput } = searchManager()
 
   const currentPlugin = toRefs(state).currentPlugin
   const { options } = optionsManager(searchValue, appList, openPlugin, currentPlugin)
@@ -82,7 +82,22 @@ const createPluginManager = () => {
     return pluginInfo
   }
 
+  const initSystemPlugin = async () => {
+    state.currentPlugin = {}
+    setSearchValue('')
+    setSubInput({ placeholder: '' })
+  }
+  async function loadPlugin(plugin) {
+    console.log('loadPlugin', plugin)
+  }
   async function openPlugin(plugin, option) {
+    window.electron.ipcRenderer.send('msg-trigger', {
+      type: 'removePlugin'
+    })
+    initSystemPlugin()
+    if (['ui', 'system'].includes(plugin.pluginType)) {
+      await loadPlugin(plugin)
+    }
     window.electron.ipcRenderer.send('msg-trigger', {
       type: 'openPlugin',
       data: {
@@ -145,6 +160,7 @@ const createPluginManager = () => {
     onSearch,
     setSearchValue,
     initPlugins,
+    openPlugin,
     getPluginInfo,
     setPluginHistory,
     changePluginHistory
