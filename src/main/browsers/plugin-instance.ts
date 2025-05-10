@@ -47,8 +47,14 @@ export default () => {
         : `file://${path.join(pluginPath, '../', pluginInfo.main)}`
     }
   }
+  const upgrade = async (name: string): Promise<void> => {
+    const pluginInst = await getPluginInstance()
+    const execRes = await pluginInst.upgrade(name)
+    return execRes
+  }
   return {
     init,
+    upgrade,
     getPluginInfo
   }
 }

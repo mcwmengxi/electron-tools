@@ -3,6 +3,8 @@ import searchManager from './search'
 // const PLUGIN_HISTORY = 'tools-local-start-app';
 import { PLUGIN_HISTORY } from '@common/constants/renderer'
 import optionsManager from './options'
+import { message } from 'ant-design-vue'
+import { exec } from 'node:child_process'
 
 // 定义插件类型
 type PluginType = {
@@ -88,23 +90,64 @@ const createPluginManager = () => {
     setSubInput({ placeholder: '' })
   }
   async function loadPlugin(plugin) {
-    console.log('loadPlugin', plugin)
+    setSearchValue('')
+    // 设置窗口高度
+    window.tools?.setExpendHeight?.(60)
+    state.pluginLoading = true
+    state.currentPlugin = plugin
+    // 自带的插件不需要检测更新
+    if (plugin.pluginType === 'sysytem') return
+    // update
+    await window.electron.ipcRenderer.sendSync('msg-trigger', {
+      type: 'upgradePlugin',
+      data: {
+        name: plugin.name
+      }
+    })
+    await Promise.resolve()
+    state.pluginLoading = false
   }
-  async function openPlugin(plugin, option) {
+  async function openPlugin(plugin, option?: Recordable) {
     window.electron.ipcRenderer.send('msg-trigger', {
       type: 'removePlugin'
     })
     initSystemPlugin()
     if (['ui', 'system'].includes(plugin.pluginType)) {
-      await loadPlugin(plugin)
-    }
-    window.electron.ipcRenderer.send('msg-trigger', {
-      type: 'openPlugin',
-      data: {
-        plugin,
-        option
+      if (state.currentPlugin && state.currentPlugin.name === plugin.name) {
+        window.tools.showMainWindow()
+        return
       }
-    })
+      await loadPlugin(plugin)
+      const targetPlugin = JSON.parse(
+        JSON.stringify({
+          ...plugin,
+          ext: plugin.ext || {
+            code: plugin.feature.code,
+            type: plugin.cmd.type || 'text',
+            payload: null
+          }
+        })
+      )
+      window.electron.ipcRenderer.send('msg-trigger', {
+        type: 'loadPlugin',
+        data: {
+          plugin: targetPlugin
+        }
+      })
+    }
+
+    if (plugin.pluginType === 'app') {
+      try {
+        window.electron.ipcRenderer.send('msg-trigger', {
+          type: 'execApp',
+          data: {
+            action: plugin.action
+          }
+        })
+      } catch {
+        message.error('启动应用出错，请确保启动应用存在！')
+      }
+    }
   }
 
   const setPluginHistory = async (plugins) => {

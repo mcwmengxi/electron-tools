@@ -113,9 +113,10 @@ const choosePlugin = (plugin) => {
 }
 const openMenu = (ext: string | undefined) => {
   // todo 打开插件市场
+  const pluginMarket = toRaw(menuPluginInfo.value)
   const sysyemPlugin = {
-    ...toRaw(menuPluginInfo.value),
-    feature: menuPluginInfo.value?.features[0],
+    ...pluginMarket,
+    feature: pluginMarket?.features[0],
     cmd: '插件市场',
     ext
   }

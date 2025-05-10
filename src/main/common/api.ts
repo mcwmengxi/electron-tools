@@ -5,6 +5,7 @@ import path from 'node:path'
 import { PLUGIN_INSTALL_DIR as baseDir } from '../../common/constants/main'
 import envHelper from '../../common/utils/envHelper'
 import SearchPlugin from '../../core/app-search/index'
+import { exec } from 'node:child_process'
 
 const staticPath = path.join(app.getAppPath(), 'resources')
 const PluginBasePathMap = {
@@ -102,7 +103,14 @@ class API extends DBInstance {
     global.LOCAL_PLUGINS.addPlugin(res)
     return res
   }
-
+  /**
+   * @desc 更新插件
+   */
+  public upgradePlugin = async ({ data }) => {
+    const { name } = data
+    const res = await pluginInstance().upgrade(name)
+    return res
+  }
   /**
    * @desc 安装插件
    */
@@ -151,6 +159,11 @@ class API extends DBInstance {
    */
   public async getPlugins({ data }) {
     return (await SearchPlugin.getSearchList?.()) ?? []
+  }
+
+  public execApp({ data }) {
+    const { action } = data
+    return exec(action)
   }
 }
 
