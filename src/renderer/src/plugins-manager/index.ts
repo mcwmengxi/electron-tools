@@ -4,7 +4,6 @@ import searchManager from './search'
 import { PLUGIN_HISTORY } from '@common/constants/renderer'
 import optionsManager from './options'
 import { message } from 'ant-design-vue'
-import { exec } from 'node:child_process'
 
 // 定义插件类型
 type PluginType = {
@@ -27,6 +26,7 @@ interface PluginManagerState {
   pluginLoading: boolean
   pluginHistory: HistoryPluginType[]
 }
+
 const createPluginManager = () => {
   const state: PluginManagerState = reactive({
     appList: [],
@@ -96,7 +96,7 @@ const createPluginManager = () => {
     state.pluginLoading = true
     state.currentPlugin = plugin
     // 自带的插件不需要检测更新
-    if (plugin.pluginType === 'sysytem') return
+    if (plugin.name === 'rubick-system-feature') return
     // update
     await window.electron.ipcRenderer.sendSync('msg-trigger', {
       type: 'upgradePlugin',
@@ -107,6 +107,7 @@ const createPluginManager = () => {
     await Promise.resolve()
     state.pluginLoading = false
   }
+  window.app.onLoadPlugin(loadPlugin)
   async function openPlugin(plugin, option?: Recordable) {
     window.electron.ipcRenderer.send('msg-trigger', {
       type: 'removePlugin'

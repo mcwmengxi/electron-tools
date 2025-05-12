@@ -23,6 +23,9 @@ const api = {
     return global.LOCAL_PLUGINS
   }
 }
+const app = {
+  onLoadPlugin: (cb: () => void) => ipcRenderer.on('loadPlugin', cb)
+}
 
 class Tools {
   private hooks: Record<string, any> = {}
@@ -170,6 +173,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
+    contextBridge.exposeInMainWorld('app', app)
     contextBridge.exposeInMainWorld('tools', getExposedTools())
   } catch (error) {
     console.error(error)
@@ -179,4 +183,6 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   // @ts-ignore (define in dts)
   window.api = api
+  // @ts-ignore (define in dts)
+  window.app = app
 }

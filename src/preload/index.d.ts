@@ -63,5 +63,8 @@ declare global {
       }
     }
     platform: string
+    app: {
+      onLoadPlugin: (cb: (...args: any[]) => void) => void
+    }
   }
 }

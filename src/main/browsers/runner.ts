@@ -36,9 +36,10 @@ export default () => {
     window.contentView.removeChildView(view)
     view = undefined
   }
-
+  const getView = (view) => view
   return {
     createView,
-    removeView
+    removeView,
+    getView
   }
 }

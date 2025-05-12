@@ -6,11 +6,14 @@ import { PLUGIN_INSTALL_DIR as baseDir } from '../../common/constants/main'
 import envHelper from '../../common/utils/envHelper'
 import SearchPlugin from '../../core/app-search/index'
 import { exec } from 'node:child_process'
+import { runner } from '../browsers'
+import { downloadImageToTemp } from '../../common/utils/file'
 
 const staticPath = path.join(app.getAppPath(), 'resources')
 const PluginBasePathMap = {
   static: staticPath
 }
+const runnerInstance = runner()
 class API extends DBInstance {
   init(mainWindow: BrowserWindow): void {
     // 响应 preload.js 事件
@@ -123,37 +126,69 @@ class API extends DBInstance {
    * @desc 打开插件
    */
 
-  public async openPlugin({ data }) {
+  public async openPlugin({ data }, window) {
     const { plugin, option } = data
-    const pluginDist = { ...plugin }
-    // 处理路径
-    const pluginPath = path.resolve(baseDir, 'node_modules', plugin.name)
-    pluginDist.indexPath = `file://${path.join(pluginPath, './', plugin.main || '')}`
-    const getIndexPath = (baseName: string) => {
-      const IdxPath = path.join(app.getAppPath(), 'resources', baseName, '/index.html')
-      return `file://${IdxPath}`
-    }
-    // 模板文件
-    if (!plugin.main) {
-      pluginDist.tplPath = envHelper.dev() ? 'http://localhost:8083/#/' : getIndexPath('tpl')
-    }
-    // 插件市场
-    if (plugin.name === 'rubick-system-feature') {
-      pluginDist.indexPath = envHelper.dev() ? 'http://localhost:8081/#/' : getIndexPath('feature')
-    }
+    let iconPath = plugin.logo
 
-    // 移除插件 removePlugin
-    // window.initRubick();
-
-    if (plugin.pluginType === 'ui' || plugin.pluginType === 'system') {
-      if (state.currentPlugin && state.currentPlugin.name === plugin.name) {
-        window.rubick.showMainWindow()
-        return
+    // 如果是网络图片则下载到临时目录
+    if (plugin.logo?.startsWith('http')) {
+      try {
+        iconPath = await downloadImageToTemp(plugin.logo)
+      } catch (e) {
+        console.error('下载通知图标失败:', e)
+        iconPath = null
       }
-      await loadPlugin(plugin)
     }
+    console.log(process.platform)
+    return new Notification({
+      title: `插件不支持当前 ${process.platform} 系统`,
+      body: `插件仅支持 ${plugin.platform?.join(',')}`,
+      icon: iconPath
+    }).show()
+    // const { plugin, option } = data
+    // const pluginDist = { ...plugin }
+    // // 处理路径
+    // const pluginPath = path.resolve(baseDir, 'node_modules', plugin.name)
+    // pluginDist.indexPath = `file://${path.join(pluginPath, './', plugin.main || '')}`
+    // const getIndexPath = (baseName: string) => {
+    //   const IdxPath = path.join(app.getAppPath(), 'resources', baseName, '/index.html')
+    //   return `file://${IdxPath}`
+    // }
+    // // 模板文件
+    // if (!plugin.main) {
+    //   pluginDist.tplPath = envHelper.dev() ? 'http://localhost:8083/#/' : getIndexPath('tpl')
+    // }
+    // // 插件市场
+    // if (plugin.name === 'rubick-system-feature') {
+    //   pluginDist.indexPath = envHelper.dev() ? 'http://localhost:8081/#/' : getIndexPath('feature')
+    // }
+
+    // // 移除插件 removePlugin
+    // // window.initRubick();
+
+    // if (plugin.pluginType === 'ui' || plugin.pluginType === 'system') {
+    //   if (state.currentPlugin && state.currentPlugin.name === plugin.name) {
+    //     window.rubick.showMainWindow()
+    //     return
+    //   }
+    //   await loadPlugin(plugin)
+    // }
   }
 
+  public loadPlugin({ data }, window, event) {
+    const { load = true } = data
+    // 发送渲染进程 触发loadPlugin
+    if (load) {
+      event.sender.send('loadPlugin', {
+        data: { ...data }
+      })
+    }
+    this.openPlugin({ data }, window)
+  }
+  public removePlugin(_, window, event) {
+    runnerInstance.removeView(window)
+    this.currentPlugin = null
+  }
   /**
    * @desc 获取插件
    */
