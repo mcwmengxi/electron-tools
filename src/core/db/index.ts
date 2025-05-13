@@ -63,8 +63,8 @@ export default class DB {
       const result: DocRes = await this.pouchDB.get(this.getDocId(name, id))
       result._id = this.replaceDocId(name, result._id)
       return result
-    } catch {
-      // console.log(e)
+    } catch (e) {
+      console.log(e)
       return null
     }
   }

@@ -129,12 +129,18 @@ const createPluginManager = () => {
           }
         })
       )
-      window.electron.ipcRenderer.send('msg-trigger', {
-        type: 'loadPlugin',
-        data: {
-          plugin: targetPlugin
-        }
-      })
+      window.electron.ipcRenderer
+        .invoke('msg-trigger', {
+          type: 'loadPlugin',
+          data: {
+            plugin: targetPlugin
+          }
+        })
+        .then((plugin) => {
+          console.log(plugin)
+
+          // state.currentPlugin = plugin
+        })
     }
 
     if (plugin.pluginType === 'app') {

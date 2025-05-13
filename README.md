@@ -54,3 +54,12 @@ mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) 
   })
 })
 ```
+
+### 单窗口多页面
+
+```javascript
+Electronv30 废弃了BrowserView，推荐使用WebContentsView 
+通过使用WebContentsView，您可以在现有的Electron窗口中嵌入Web内容，而无需创建新的窗口，共享一个进程
+view = new WebContentsView({...})
+window.contentView.addChildView(view)
+```

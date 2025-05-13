@@ -1,8 +1,8 @@
 <template>
   <div class="handle-bar">
     <div class="handle-info">
-      <img :src="logo" alt="logo" width="24" height="24" />
-      <span>rubick 系统菜单</span>
+      <img class="tools-logo" :src="logo" alt="logo" width="24" height="24" />
+      <span>tools系统菜单</span>
     </div>
     <div class="handle-container">
       <div class="handle">
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from '../assets/electron.svg'
+import logo from '../../../../resources/logo.png'
 const platform = window.electron.process.platform
 // 最小化
 const minimize = () => {
@@ -71,5 +71,8 @@ const openDevTool = () => {
       padding: 0 8px;
     }
   }
+}
+.tools-logo {
+  border-radius: 100%;
 }
 </style>

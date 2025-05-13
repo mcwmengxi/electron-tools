@@ -40,6 +40,6 @@ export default defineConfig({
     outDir: fileURLToPath(new URL('../resources/feature', import.meta.url))
   },
   server: {
-    port: 9080
+    port: 8081
   }
 })

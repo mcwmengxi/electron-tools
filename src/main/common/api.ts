@@ -8,10 +8,10 @@ import SearchPlugin from '../../core/app-search/index'
 import { exec } from 'node:child_process'
 import { runner } from '../browsers'
 import { downloadImageToTemp } from '../../common/utils/file'
+import { getStaticPath } from '../../common/utils'
 
-const staticPath = path.join(app.getAppPath(), 'resources')
 const PluginBasePathMap = {
-  static: staticPath
+  static: getStaticPath()
 }
 const runnerInstance = runner()
 class API extends DBInstance {
@@ -24,6 +24,15 @@ class API extends DBInstance {
         event.returnValue = data
       } catch (error) {
         console.log(args.type, '未声明', error, this[args.type])
+      }
+    })
+    ipcMain.handle('msg-trigger', async (event, args) => {
+      const window = args.winId ? BrowserWindow.fromId(args.winId) : mainWindow
+      try {
+        const data = await this[args.type](args, window, event)
+        return data
+      } catch (error) {
+        console.log(args.type, 'handle未声明', error, this[args.type])
       }
     })
     // 按 ESC 退出插件
@@ -139,12 +148,35 @@ class API extends DBInstance {
         iconPath = null
       }
     }
-    console.log(process.platform)
-    return new Notification({
-      title: `插件不支持当前 ${process.platform} 系统`,
-      body: `插件仅支持 ${plugin.platform?.join(',')}`,
-      icon: iconPath
-    }).show()
+    if (plugin.platform && !plugin.platform.includes(process.platform)) {
+      return new Notification({
+        title: `插件不支持当前 ${process.platform} 系统`,
+        body: `插件仅支持 ${plugin.platform?.join(',')}`,
+        icon: iconPath
+      }).show()
+    }
+    // todo 设置大小
+    this.removePlugin(null, window)
+
+    if (!plugin.main) {
+      plugin.tplPath = envHelper.dev()
+        ? 'http://localhost:8083/#/'
+        : `file://${getStaticPath()}/tpl/index.html`
+    }
+    if (plugin.name === 'rubick-system-feature') {
+      plugin.logo = plugin.logo || `file://${getStaticPath()}/logo.png`
+      plugin.indexPath = envHelper.dev()
+        ? 'http://localhost:8081/#/'
+        : `file://${getStaticPath()}/feature/index.html`
+    } else if (!plugin.indexPath) {
+      const pluginPath = path.resolve(baseDir, 'node_modules', plugin.name)
+      plugin.indexPath = `file://${path.join(pluginPath, './', plugin.main || '')}`
+    }
+    console.log('openPlugin', plugin)
+    runnerInstance.init(plugin, window)
+    this.currentPlugin = plugin
+
+    return plugin
     // const { plugin, option } = data
     // const pluginDist = { ...plugin }
     // // 处理路径
@@ -183,9 +215,10 @@ class API extends DBInstance {
         data: { ...data }
       })
     }
-    this.openPlugin({ data }, window)
+    const plugin = this.openPlugin({ data }, window)
+    return plugin
   }
-  public removePlugin(_, window, event) {
+  public removePlugin(_, window) {
     runnerInstance.removeView(window)
     this.currentPlugin = null
   }

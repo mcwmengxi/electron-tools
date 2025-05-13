@@ -151,6 +151,7 @@ class AdapterHandler {
     const packageJSON = JSON.parse(fs.readFileSync(`${this.baseDir}/package.json`, 'utf-8'))
     const registryUrl = `https://registry.npmmirror.com/${name}`
     try {
+      if (!packageJSON.dependencies) return
       const installedVersion = packageJSON.dependencies[name].replace('^', '')
       let latestVersion = this.pluginCaches[name]
       if (!latestVersion) {
