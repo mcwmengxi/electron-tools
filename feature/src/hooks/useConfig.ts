@@ -1,4 +1,4 @@
-const LOCAL_CONFIG_KEY = 'rubick-local-config'
+const LOCAL_CONFIG_KEY = 'tools-local-config'
 const useConfig = () => {
   const getConfig = () => {
     const { data } = window.tools.db.get(LOCAL_CONFIG_KEY) || {}
