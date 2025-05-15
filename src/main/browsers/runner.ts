@@ -16,7 +16,7 @@ export default () => {
     if (!preload) return
     if (envHelper.dev()) {
       if (name === 'rubick-system-feature') {
-        return path.resolve(getStaticPath(), `../out/preload/index.js`)
+        return path.resolve(getStaticPath(), `../out/preload/featurePreload.js`)
         // return path.resolve(getStaticPath(), `../feature/public/preload.js`)
       }
       if (tplPath) {

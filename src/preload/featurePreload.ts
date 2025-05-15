@@ -35,15 +35,15 @@ class Tools {
     //db
     Object.assign(this.db, {
       get: (id) => ipcSendSync('dbGet', { id }),
-      put: (data) => ipcSendSync('dbPut', { data }),
+      put: (data) => ipcSendSync('dbPut', { data })
 
-      remove: (doc) => ipcSendSync('dbRemove', { doc }),
-      bulkDocs: (docs) => ipcSendSync('dbBulkDocs', { docs }),
-      allDocs: (key) => ipcSendSync('dbAllDocs', { key }),
-      postAttachment: (docId, attachment, type) =>
-        ipcSendSync('dbPostAttachment', { docId, attachment, type }),
-      getAttachment: (docId) => ipcSendSync('dbGetAttachment', { docId }),
-      getAttachmentType: (docId) => ipcSendSync('dbGetAttachmentType', { docId })
+      // remove: (doc) => ipcSendSync('dbRemove', { doc }),
+      // bulkDocs: (docs) => ipcSendSync('dbBulkDocs', { docs }),
+      // allDocs: (key) => ipcSendSync('dbAllDocs', { key }),
+      // postAttachment: (docId, attachment, type) =>
+      //   ipcSendSync('dbPostAttachment', { docId, attachment, type }),
+      // getAttachment: (docId) => ipcSendSync('dbGetAttachment', { docId }),
+      // getAttachmentType: (docId) => ipcSendSync('dbGetAttachmentType', { docId })
     })
   }
 
