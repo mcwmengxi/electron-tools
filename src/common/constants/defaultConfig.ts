@@ -3,7 +3,6 @@ import path from 'node:path'
 
 // const staticPath = path.join(__dirname, '../../public') // 假设静态资源在 public 文件夹中
 const staticPath = path.join(app.getAppPath(), 'resources')
-console.log(path.join(staticPath, 'logo.png'), 'staticPath')
 
 export default {
   version: 7,
@@ -16,7 +15,7 @@ export default {
       successColor: '#c0d695',
       infoColor: '#aa8eeB',
       logo: `app://${path.join(staticPath, 'logo.png')}`,
-      placeholder: '你好，Rubick！请输入插件关键词',
+      placeholder: '你好，Tools！请输入插件关键词',
       username: 'Tools'
     },
     shortCut: {

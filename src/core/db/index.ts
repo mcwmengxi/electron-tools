@@ -63,8 +63,14 @@ export default class DB {
       const result: DocRes = await this.pouchDB.get(this.getDocId(name, id))
       result._id = this.replaceDocId(name, result._id)
       return result
-    } catch (e) {
-      console.log(e)
+    } catch (error: unknown) {
+      if (error instanceof Error && 'reason' in error && error.reason === 'missing') {
+        const errorInfo = error as Error & { docId: string; reason: string }
+        console.debug(`Document not found: ${name}/${errorInfo!.docId}`)
+        return null
+      } else {
+        console.log(error)
+      }
       return null
     }
   }

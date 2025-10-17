@@ -48,8 +48,8 @@ export default class DBInstance {
     }
     return
   }
-  public dbGet({ data }) {
-    return dbInstance.get(this.DBKEY, data.id)
+  public async dbGet({ data }) {
+    return await dbInstance.get(this.DBKEY, data.id)
   }
 
   public dbRemove({ data }) {

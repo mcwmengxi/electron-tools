@@ -55,16 +55,16 @@ export default () => {
         responseHeaders: {
           ...details.responseHeaders,
           'Content-Security-Policy': [
-            "default-src 'self'; img-src 'self' data: app://; script-src 'self'; style-src 'self' 'unsafe-inline';"
+            "default-src * 'self' 'unsafe-inline' 'unsafe-eval' https://gitee.com; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src * 'self' data: https: app://*; connect-src * 'self'  http: blob: https: https://gitee.com;"
           ]
         }
       })
     })
-    protocol.interceptFileProtocol('image', (req, callback) => {
-      const url = req.url.substr(8)
-      console.log(url, 'image')
-      callback(decodeURI(url))
-    })
+    // protocol.interceptFileProtocol('image', (req, callback) => {
+    //   const url = req.url.substr(8)
+    //   console.log(url, 'image')
+    //   callback(decodeURI(url))
+    // })
     return mainWindow
   }
   const getWindow = () => mainWindow

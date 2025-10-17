@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { ref } from 'vue'
+import LeftMenu from '@/components/menu/index.vue'
 
 const active = ref(['tools'])
 const handleOpen = (key: string, keyPath: string[]) => {
@@ -13,6 +14,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 <template>
   <div class="left_menu">
+    <LeftMenu />
     <el-menu
       default-active="2"
       class="el-menu-vertical-demo"

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, net, Notification, screen } from 'electron'
 import DBInstance from './db'
 import pluginInstance from '../browsers/plugin-instance'
 import path from 'node:path'
@@ -9,6 +9,7 @@ import { exec } from 'node:child_process'
 import { runner } from '../browsers'
 import { downloadImageToTemp } from '../../common/utils/file'
 import { getStaticPath } from '../../common/utils'
+import { log } from 'node:console'
 
 const PluginBasePathMap = {
   static: getStaticPath()
@@ -229,6 +230,13 @@ class API extends DBInstance {
     return (await SearchPlugin.getSearchList?.()) ?? []
   }
 
+  public async getTotalPlugins({ data }) {
+    const val = await net.fetch(
+      'https://gitee.com/monkeyWang/rubickdatabase/raw/master/plugins/total-plugins.json'
+    )
+    log(val)
+    return val
+  }
   public execApp({ data }) {
     const { action } = data
     return exec(action)

@@ -1,5 +1,5 @@
 <template>
-  <a-menu :selected-keys="active" mode="vertical" @select="({ key }) => changeMenu(key)">
+  <a-menu :selected-keys="active" mode="vertical" @select="changeMenu">
     <a-menu-item key="finder">
       <template #icon>
         <StarOutlined style="font-size: 16px" />
@@ -68,7 +68,30 @@
 </template>
 
 <script setup lang="ts">
+import { usePluginMarketStore } from '@/stores/pluginMarket'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-
+import {
+  StarOutlined,
+  SendOutlined,
+  SearchOutlined,
+  FileImageOutlined,
+  DatabaseOutlined,
+  CodeOutlined,
+  SettingOutlined,
+  HeartOutlined,
+  BugOutlined
+} from '@ant-design/icons-vue'
+import useConfig from '@/hooks/useConfig'
 const router = useRouter()
+const pluginMarketStore = usePluginMarketStore()
+const { getConfig } = useConfig()
+const { perf } = getConfig()
+const active = computed(() => pluginMarketStore.active)
+const changeMenu = ({ key }: { key: string }) => {
+  pluginMarketStore.commonUpdate({ active: [key] })
+  router.push(key)
+}
+
+pluginMarketStore.init()
 </script>

@@ -41,5 +41,11 @@ export default defineConfig({
   },
   server: {
     port: 8081
+    // proxy: {
+    //   '/': {
+    //     target: 'http://localhost:8081',
+    //     changeOrigin: true
+    //   }
+    // }
   }
 })
